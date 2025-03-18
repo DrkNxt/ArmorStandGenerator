@@ -47,7 +47,7 @@ public final class ArmorStands extends JavaPlugin {
         return item;
     }
 
-    public void setSelectedTab(Player p, Inventory inventory, int selectedSlot) {
+    public void setSelectedTab(Inventory inventory, int selectedSlot) {
 
         // remove enchantment effect from tab items
         for (int i = 2; i < 7; i++) {
@@ -159,7 +159,7 @@ public final class ArmorStands extends JavaPlugin {
         }
     }
 
-    public void setEnchantmentOverride(Player p, Inventory inventory, int row, int selectedSlot){
+    public void setEnchantmentOverride(Inventory inventory, int row, int selectedSlot){
 
         for (int i = 1; i<8; i++) {
             ItemStack item = inventory.getItem(i + row*9);
@@ -183,7 +183,7 @@ public final class ArmorStands extends JavaPlugin {
     // open tab settings
     public void openCreateSettings(Player p, Inventory inventory) {
 
-        setSelectedTab(p, inventory, 2);
+        setSelectedTab(inventory, 2);
 
         // create items
         ItemStack on = getItem(Material.GREEN_CONCRETE, ChatColor.GREEN + "ON", List.of());
@@ -300,9 +300,6 @@ public final class ArmorStands extends JavaPlugin {
         item.setItemMeta(itemMeta);
         inventory.setItem(selectedSlot, item);
 
-        // get armor stand
-        ArmorStand as = armorStands.get(p);
-
         // create x,y,z +- and reset items
         ItemStack xPlus = getItem(Material.GREEN_CONCRETE, ChatColor.GREEN + "X+",
                 List.of(ChatColor.GOLD + "Left Click to increase by 1", ChatColor.GOLD + "Right click to increase by 10"));
@@ -351,7 +348,7 @@ public final class ArmorStands extends JavaPlugin {
 
     public void openCreatePosition(Player p, Inventory inventory) {
 
-        setSelectedTab(p, inventory, 3);
+        setSelectedTab(inventory, 3);
 
         // create selectable items
         ItemStack position = getItem(Material.RECOVERY_COMPASS, ChatColor.YELLOW + "Position",
@@ -385,16 +382,16 @@ public final class ArmorStands extends JavaPlugin {
 
     // TODO
     // open tab main hand
-    public void openCreateMainHand(Player p, Inventory inventory) {
+    public void openCreateMainHand(Inventory inventory) {
 
-        setSelectedTab(p, inventory, 4);
+        setSelectedTab(inventory, 4);
     }
 
     // TODO
     // open tab off hand
-    public void openCreateOffHand(Player p, Inventory inventory) {
+    public void openCreateOffHand(Inventory inventory) {
 
-        setSelectedTab(p, inventory, 5);
+        setSelectedTab(inventory, 5);
     }
 
     // update tab armor
@@ -407,97 +404,97 @@ public final class ArmorStands extends JavaPlugin {
 
         switch (helmet){
             case Material.LEATHER_HELMET:
-                setEnchantmentOverride(p, inventory, 2, 2);
+                setEnchantmentOverride(inventory, 2, 2);
                 break;
             case Material.CHAINMAIL_HELMET:
-                setEnchantmentOverride(p, inventory, 2, 3);
+                setEnchantmentOverride(inventory, 2, 3);
                 break;
             case Material.GOLDEN_HELMET:
-                setEnchantmentOverride(p, inventory, 2, 4);
+                setEnchantmentOverride(inventory, 2, 4);
                 break;
             case Material.IRON_HELMET:
-                setEnchantmentOverride(p, inventory, 2, 5);
+                setEnchantmentOverride(inventory, 2, 5);
                 break;
             case Material.DIAMOND_HELMET:
-                setEnchantmentOverride(p, inventory, 2, 6);
+                setEnchantmentOverride(inventory, 2, 6);
                 break;
             case Material.NETHERITE_HELMET:
-                setEnchantmentOverride(p, inventory, 2, 7);
+                setEnchantmentOverride(inventory, 2, 7);
                 break;
             default:
-                setEnchantmentOverride(p, inventory, 2, 1);
+                setEnchantmentOverride(inventory, 2, 1);
                 break;
         }
 
         switch (chestplate){
             case Material.LEATHER_CHESTPLATE:
-                setEnchantmentOverride(p, inventory, 3, 2);
+                setEnchantmentOverride(inventory, 3, 2);
                 break;
             case Material.CHAINMAIL_CHESTPLATE:
-                setEnchantmentOverride(p, inventory, 3, 3);
+                setEnchantmentOverride(inventory, 3, 3);
                 break;
             case Material.GOLDEN_CHESTPLATE:
-                setEnchantmentOverride(p, inventory, 3, 4);
+                setEnchantmentOverride(inventory, 3, 4);
                 break;
             case Material.IRON_CHESTPLATE:
-                setEnchantmentOverride(p, inventory, 3, 5);
+                setEnchantmentOverride(inventory, 3, 5);
                 break;
             case Material.DIAMOND_CHESTPLATE:
-                setEnchantmentOverride(p, inventory, 3, 6);
+                setEnchantmentOverride(inventory, 3, 6);
                 break;
             case Material.NETHERITE_CHESTPLATE:
-                setEnchantmentOverride(p, inventory, 3, 7);
+                setEnchantmentOverride(inventory, 3, 7);
                 break;
             default:
-                setEnchantmentOverride(p, inventory, 3, 1);
+                setEnchantmentOverride(inventory, 3, 1);
                 break;
         }
 
         switch (leggings){
             case Material.LEATHER_LEGGINGS:
-                setEnchantmentOverride(p, inventory, 4, 2);
+                setEnchantmentOverride(inventory, 4, 2);
                 break;
             case Material.CHAINMAIL_LEGGINGS:
-                setEnchantmentOverride(p, inventory, 4, 3);
+                setEnchantmentOverride(inventory, 4, 3);
                 break;
             case Material.GOLDEN_LEGGINGS:
-                setEnchantmentOverride(p, inventory, 4, 4);
+                setEnchantmentOverride(inventory, 4, 4);
                 break;
             case Material.IRON_LEGGINGS:
-                setEnchantmentOverride(p, inventory, 4, 5);
+                setEnchantmentOverride(inventory, 4, 5);
                 break;
             case Material.DIAMOND_LEGGINGS:
-                setEnchantmentOverride(p, inventory, 4, 6);
+                setEnchantmentOverride(inventory, 4, 6);
                 break;
             case Material.NETHERITE_LEGGINGS:
-                setEnchantmentOverride(p, inventory, 4, 7);
+                setEnchantmentOverride(inventory, 4, 7);
                 break;
             default:
-                setEnchantmentOverride(p, inventory, 4, 1);
+                setEnchantmentOverride(inventory, 4, 1);
                 break;
         }
 
         switch (boots){
             case Material.LEATHER_BOOTS:
-                setEnchantmentOverride(p, inventory, 5, 2);
+                setEnchantmentOverride(inventory, 5, 2);
                 break;
             case Material.CHAINMAIL_BOOTS:
-                setEnchantmentOverride(p, inventory, 5, 3);
+                setEnchantmentOverride(inventory, 5, 3);
                 break;
             case Material.GOLDEN_BOOTS:
-                setEnchantmentOverride(p, inventory, 5, 4);
+                setEnchantmentOverride(inventory, 5, 4);
                 break;
             case Material.IRON_BOOTS:
-                setEnchantmentOverride(p, inventory, 5, 5);
+                setEnchantmentOverride(inventory, 5, 5);
                 break;
             case Material.DIAMOND_BOOTS:
-                setEnchantmentOverride(p, inventory, 5, 6);
+                setEnchantmentOverride(inventory, 5, 6);
                 break;
             case Material.NETHERITE_BOOTS:
-                setEnchantmentOverride(p, inventory, 5, 7);
+                setEnchantmentOverride(inventory, 5, 7);
                 break;
             default:
-                setEnchantmentOverride(p, inventory, 5, 1);
+                setEnchantmentOverride(inventory, 5, 1);
                 break;
         }
 
@@ -506,7 +503,7 @@ public final class ArmorStands extends JavaPlugin {
     // open tab armo
     public void openCreateArmor(Player p, Inventory inventory) {
 
-        setSelectedTab(p, inventory, 6);
+        setSelectedTab(inventory, 6);
 
         // create armor items
         ItemStack noHelmet = getItem(Material.BARRIER, ChatColor.YELLOW + "No Helmet", List.of(ChatColor.DARK_PURPLE + "Click to select"));
@@ -679,15 +676,13 @@ public final class ArmorStands extends JavaPlugin {
 
         // Create center item based on choice to make
         ItemStack c = new ItemStack(Material.BARRIER);
-        ItemMeta cMeta = c.getItemMeta();
-                switch (choice){
-            case "duplicate":
-                c = getItem(Material.ARMOR_STAND, ChatColor.RED + "You already have an active armor stand!",
-                        List.of(ChatColor.GOLD + "Do you want to delete your last edited", ChatColor.GOLD + "Armor stand and create a new one?"));
-            case "delete":
-                c = getItem(Material.ARMOR_STAND, ChatColor.RED + "Delete",
-                        List.of(ChatColor.GOLD + "Are you sure you want to delete your", ChatColor.GOLD + "current armor stand?"));
-        }
+        c = switch (choice) {
+            case "duplicate" -> getItem(Material.ARMOR_STAND, ChatColor.RED + "You already have an active armor stand!",
+                    List.of(ChatColor.GOLD + "Do you want to delete your last edited", ChatColor.GOLD + "Armor stand and create a new one?"));
+            case "delete" -> getItem(Material.ARMOR_STAND, ChatColor.RED + "Delete",
+                    List.of(ChatColor.GOLD + "Are you sure you want to delete your", ChatColor.GOLD + "current armor stand?"));
+            default -> c;
+        };
 
         openChoiceMenu(p, deleteMenu, c);
     }

@@ -311,10 +311,10 @@ public class MenuListener implements Listener {
                     plugin.openCreatePosition(p, e.getInventory());
                 }  else if (clickedItem.equals(CREATE_MAIN_HAND)) {
                     playClickSound(p);
-                    plugin.openCreateMainHand(p, e.getInventory());
+                    plugin.openCreateMainHand(e.getInventory());
                 }  else if (clickedItem.equals(CREATE_OFF_HAND)) {
                     playClickSound(p);
-                    plugin.openCreateOffHand(p, e.getInventory());
+                    plugin.openCreateOffHand(e.getInventory());
                 }  else if (clickedItem.equals(CREATE_ARMOR)) {
                     playClickSound(p);
                     plugin.openCreateArmor(p, e.getInventory());
