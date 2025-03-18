@@ -1,0 +1,12 @@
+name: ArmorStands
+version: '1.0'
+main: me.drknxt.armorStands.ArmorStands
+api-version: '1.21'
+authors: [ DrkNxt ]
+description: Tutorial plugin with armor stands
+commands:
+  armorstand:
+    description: Open armor stand creation menu
+    usage: /<command>
+    aliases:
+      - as
