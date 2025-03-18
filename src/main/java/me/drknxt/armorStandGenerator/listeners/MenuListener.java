@@ -18,6 +18,8 @@ import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.util.EulerAngle;
 import org.bukkit.util.Vector;
 
+import java.util.Objects;
+
 public class MenuListener implements Listener {
 
     // Menu list
@@ -144,7 +146,9 @@ public class MenuListener implements Listener {
         for (int i = 1; i < 4; i++) {
             for (int j = 0; j < 4; j++){
                 ItemStack position = inventory.getItem(i + 9*j + 18);
+                assert position != null;
                 ItemMeta positionMeta = position.getItemMeta();
+                assert positionMeta != null;
                 if (positionMeta.hasEnchantmentGlintOverride() && positionMeta.getEnchantmentGlintOverride()) {
                     pos = positionMeta.getDisplayName();
                 }
@@ -204,12 +208,14 @@ public class MenuListener implements Listener {
         }
     }
 
-    public int getSelectedSlot(Player p, Inventory inventory) {
+    public int getSelectedSlot(Inventory inventory) {
 
         for (int i = 1; i < 4; i++) {
             for (int j = 0; j < 4; j++){
                 ItemStack tab = inventory.getItem(i + 9*j + 18);
+                assert tab != null;
                 ItemMeta tabMeta = tab.getItemMeta();
+                assert tabMeta != null;
                 if (tabMeta.hasEnchantmentGlintOverride()) {
                     if (tabMeta.getEnchantmentGlintOverride()){
                         return i + 9*j + 18;
@@ -272,32 +278,30 @@ public class MenuListener implements Listener {
             e.setCancelled(true);
             ArmorStand as = plugin.armorStands.get(p);
 
-            if (!e.isRightClick() && !e.isLeftClick()) {
-                return;
-            } else if (e.isRightClick()){
+            if (e.isRightClick()){
                 if (clickedItem.equals(POSITION_X_PLUS)) {
                     changeSelectedPosition(p, e.getInventory(), new Vector(10,0,0));
-                    plugin.getCurrentRotation(p, e.getInventory(), getSelectedSlot(p, e.getInventory()));
+                    plugin.getCurrentRotation(p, e.getInventory(), getSelectedSlot(e.getInventory()));
 
                 } else if (clickedItem.equals(POSITION_X_MINUS)) {
                     changeSelectedPosition(p, e.getInventory(), new Vector(-10,0,0));
-                    plugin.getCurrentRotation(p, e.getInventory(), getSelectedSlot(p, e.getInventory()));
+                    plugin.getCurrentRotation(p, e.getInventory(), getSelectedSlot(e.getInventory()));
 
                 } else if (clickedItem.equals(POSITION_Y_PLUS)) {
                     changeSelectedPosition(p, e.getInventory(), new Vector(0,10,0));
-                    plugin.getCurrentRotation(p, e.getInventory(), getSelectedSlot(p, e.getInventory()));
+                    plugin.getCurrentRotation(p, e.getInventory(), getSelectedSlot(e.getInventory()));
 
                 } else if (clickedItem.equals(POSITION_Y_MINUS)) {
                     changeSelectedPosition(p, e.getInventory(), new Vector(0,-10,0));
-                    plugin.getCurrentRotation(p, e.getInventory(), getSelectedSlot(p, e.getInventory()));
+                    plugin.getCurrentRotation(p, e.getInventory(), getSelectedSlot(e.getInventory()));
 
                 } else if (clickedItem.equals(POSITION_Z_PLUS)) {
                     changeSelectedPosition(p, e.getInventory(), new Vector(0,0,10));
-                    plugin.getCurrentRotation(p, e.getInventory(), getSelectedSlot(p, e.getInventory()));
+                    plugin.getCurrentRotation(p, e.getInventory(), getSelectedSlot(e.getInventory()));
 
                 } else if (clickedItem.equals(POSITION_Z_MINUS)) {
                     changeSelectedPosition(p, e.getInventory(), new Vector(0,0,-10));
-                    plugin.getCurrentRotation(p, e.getInventory(), getSelectedSlot(p, e.getInventory()));
+                    plugin.getCurrentRotation(p, e.getInventory(), getSelectedSlot(e.getInventory()));
                 }
             } else if(e.isLeftClick()){
                 if (clickedItem.equals(CREATE_COMPLETE)){
@@ -411,146 +415,146 @@ public class MenuListener implements Listener {
 
                 } else if (clickedItem.equals(POSITION_X_PLUS)) {
                     changeSelectedPosition(p, e.getInventory(), new Vector(1,0,0));
-                    plugin.getCurrentRotation(p, e.getInventory(), getSelectedSlot(p, e.getInventory()));
+                    plugin.getCurrentRotation(p, e.getInventory(), getSelectedSlot(e.getInventory()));
 
                 } else if (clickedItem.equals(POSITION_X_MINUS)) {
                     changeSelectedPosition(p, e.getInventory(), new Vector(-1,0,0));
-                    plugin.getCurrentRotation(p, e.getInventory(), getSelectedSlot(p, e.getInventory()));
+                    plugin.getCurrentRotation(p, e.getInventory(), getSelectedSlot(e.getInventory()));
 
                 } else if (clickedItem.equals(POSITION_Y_PLUS)) {
                     changeSelectedPosition(p, e.getInventory(), new Vector(0,1,0));
-                    plugin.getCurrentRotation(p, e.getInventory(), getSelectedSlot(p, e.getInventory()));
+                    plugin.getCurrentRotation(p, e.getInventory(), getSelectedSlot(e.getInventory()));
 
                 } else if (clickedItem.equals(POSITION_Y_MINUS)) {
                     changeSelectedPosition(p, e.getInventory(), new Vector(0,-1,0));
-                    plugin.getCurrentRotation(p, e.getInventory(), getSelectedSlot(p, e.getInventory()));
+                    plugin.getCurrentRotation(p, e.getInventory(), getSelectedSlot(e.getInventory()));
 
                 } else if (clickedItem.equals(POSITION_Z_PLUS)) {
                     changeSelectedPosition(p, e.getInventory(), new Vector(0,0,1));
-                    plugin.getCurrentRotation(p, e.getInventory(), getSelectedSlot(p, e.getInventory()));
+                    plugin.getCurrentRotation(p, e.getInventory(), getSelectedSlot(e.getInventory()));
 
                 } else if (clickedItem.equals(POSITION_Z_MINUS)) {
                     changeSelectedPosition(p, e.getInventory(), new Vector(0,0,-1));
-                    plugin.getCurrentRotation(p, e.getInventory(), getSelectedSlot(p, e.getInventory()));
+                    plugin.getCurrentRotation(p, e.getInventory(), getSelectedSlot(e.getInventory()));
 
                 } else if (clickedItem.equals(POSITION_RESET)) {
                     changeSelectedPosition(p, e.getInventory(), new Vector());
-                    plugin.getCurrentRotation(p, e.getInventory(), getSelectedSlot(p, e.getInventory()));
+                    plugin.getCurrentRotation(p, e.getInventory(), getSelectedSlot(e.getInventory()));
 
                 } else if (clickedItem.equals(POSITION_TELEPORT)) {
                     playClickSound(p);
                     as.teleport(p);
-                    plugin.getCurrentRotation(p, e.getInventory(), getSelectedSlot(p, e.getInventory()));
+                    plugin.getCurrentRotation(p, e.getInventory(), getSelectedSlot(e.getInventory()));
                 } else if (clickedItem.equals(ARMOR_NO_HELMET)) {
-                    as.getEquipment().setHelmet(new ItemStack(Material.AIR));
+                    Objects.requireNonNull(as.getEquipment()).setHelmet(new ItemStack(Material.AIR));
                     plugin.updateCreateArmor(p, e.getInventory());
 
                 } else if (clickedItem.equals(ARMOR_LEATHER_HELMET)) {
-                    as.getEquipment().setHelmet(new ItemStack(Material.LEATHER_HELMET));
+                    Objects.requireNonNull(as.getEquipment()).setHelmet(new ItemStack(Material.LEATHER_HELMET));
                     plugin.updateCreateArmor(p, e.getInventory());
 
                 } else if (clickedItem.equals(ARMOR_CHAIN_HELMET)) {
-                    as.getEquipment().setHelmet(new ItemStack(Material.CHAINMAIL_HELMET));
+                    Objects.requireNonNull(as.getEquipment()).setHelmet(new ItemStack(Material.CHAINMAIL_HELMET));
                     plugin.updateCreateArmor(p, e.getInventory());
 
                 } else if (clickedItem.equals(ARMOR_GOLD_HELMET)) {
-                    as.getEquipment().setHelmet(new ItemStack(Material.GOLDEN_HELMET));
+                    Objects.requireNonNull(as.getEquipment()).setHelmet(new ItemStack(Material.GOLDEN_HELMET));
                     plugin.updateCreateArmor(p, e.getInventory());
 
                 } else if (clickedItem.equals(ARMOR_IRON_HELMET)) {
-                    as.getEquipment().setHelmet(new ItemStack(Material.IRON_HELMET));
+                    Objects.requireNonNull(as.getEquipment()).setHelmet(new ItemStack(Material.IRON_HELMET));
                     plugin.updateCreateArmor(p, e.getInventory());
 
                 } else if (clickedItem.equals(ARMOR_DIAMOND_HELMET)) {
-                    as.getEquipment().setHelmet(new ItemStack(Material.DIAMOND_HELMET));
+                    Objects.requireNonNull(as.getEquipment()).setHelmet(new ItemStack(Material.DIAMOND_HELMET));
                     plugin.updateCreateArmor(p, e.getInventory());
 
                 } else if (clickedItem.equals(ARMOR_NETHERITE_HELMET)) {
-                    as.getEquipment().setHelmet(new ItemStack(Material.NETHERITE_HELMET));
+                    Objects.requireNonNull(as.getEquipment()).setHelmet(new ItemStack(Material.NETHERITE_HELMET));
                     plugin.updateCreateArmor(p, e.getInventory());
 
                 } else if (clickedItem.equals(ARMOR_NO_CHESTPLATE)) {
-                    as.getEquipment().setChestplate(new ItemStack(Material.AIR));
+                    Objects.requireNonNull(as.getEquipment()).setChestplate(new ItemStack(Material.AIR));
                     plugin.updateCreateArmor(p, e.getInventory());
 
                 } else if (clickedItem.equals(ARMOR_LEATHER_CHESTPLATE)) {
-                    as.getEquipment().setChestplate(new ItemStack(Material.LEATHER_CHESTPLATE));
+                    Objects.requireNonNull(as.getEquipment()).setChestplate(new ItemStack(Material.LEATHER_CHESTPLATE));
                     plugin.updateCreateArmor(p, e.getInventory());
 
                 } else if (clickedItem.equals(ARMOR_CHAIN_CHESTPLATE)) {
-                    as.getEquipment().setChestplate(new ItemStack(Material.CHAINMAIL_CHESTPLATE));
+                    Objects.requireNonNull(as.getEquipment()).setChestplate(new ItemStack(Material.CHAINMAIL_CHESTPLATE));
                     plugin.updateCreateArmor(p, e.getInventory());
 
                 } else if (clickedItem.equals(ARMOR_GOLD_CHESTPLATE)) {
-                    as.getEquipment().setChestplate(new ItemStack(Material.GOLDEN_CHESTPLATE));
+                    Objects.requireNonNull(as.getEquipment()).setChestplate(new ItemStack(Material.GOLDEN_CHESTPLATE));
                     plugin.updateCreateArmor(p, e.getInventory());
 
                 } else if (clickedItem.equals(ARMOR_IRON_CHESTPLATE)) {
-                    as.getEquipment().setChestplate(new ItemStack(Material.IRON_CHESTPLATE));
+                    Objects.requireNonNull(as.getEquipment()).setChestplate(new ItemStack(Material.IRON_CHESTPLATE));
                     plugin.updateCreateArmor(p, e.getInventory());
 
                 } else if (clickedItem.equals(ARMOR_DIAMOND_CHESTPLATE)) {
-                    as.getEquipment().setChestplate(new ItemStack(Material.DIAMOND_CHESTPLATE));
+                    Objects.requireNonNull(as.getEquipment()).setChestplate(new ItemStack(Material.DIAMOND_CHESTPLATE));
                     plugin.updateCreateArmor(p, e.getInventory());
 
                 } else if (clickedItem.equals(ARMOR_NETHERITE_CHESTPLATE)) {
-                    as.getEquipment().setChestplate(new ItemStack(Material.NETHERITE_CHESTPLATE));
+                    Objects.requireNonNull(as.getEquipment()).setChestplate(new ItemStack(Material.NETHERITE_CHESTPLATE));
                     plugin.updateCreateArmor(p, e.getInventory());
 
                 } else if (clickedItem.equals(ARMOR_NO_LEGGINGS)) {
-                    as.getEquipment().setLeggings(new ItemStack(Material.AIR));
+                    Objects.requireNonNull(as.getEquipment()).setLeggings(new ItemStack(Material.AIR));
                     plugin.updateCreateArmor(p, e.getInventory());
 
                 } else if (clickedItem.equals(ARMOR_LEATHER_LEGGINGS)) {
-                    as.getEquipment().setLeggings(new ItemStack(Material.LEATHER_LEGGINGS));
+                    Objects.requireNonNull(as.getEquipment()).setLeggings(new ItemStack(Material.LEATHER_LEGGINGS));
                     plugin.updateCreateArmor(p, e.getInventory());
 
                 } else if (clickedItem.equals(ARMOR_CHAIN_LEGGINGS)) {
-                    as.getEquipment().setLeggings(new ItemStack(Material.CHAINMAIL_LEGGINGS));
+                    Objects.requireNonNull(as.getEquipment()).setLeggings(new ItemStack(Material.CHAINMAIL_LEGGINGS));
                     plugin.updateCreateArmor(p, e.getInventory());
 
                 } else if (clickedItem.equals(ARMOR_GOLD_LEGGINGS)) {
-                    as.getEquipment().setLeggings(new ItemStack(Material.GOLDEN_LEGGINGS));
+                    Objects.requireNonNull(as.getEquipment()).setLeggings(new ItemStack(Material.GOLDEN_LEGGINGS));
                     plugin.updateCreateArmor(p, e.getInventory());
 
                 } else if (clickedItem.equals(ARMOR_IRON_LEGGINGS)) {
-                    as.getEquipment().setLeggings(new ItemStack(Material.IRON_LEGGINGS));
+                    Objects.requireNonNull(as.getEquipment()).setLeggings(new ItemStack(Material.IRON_LEGGINGS));
                     plugin.updateCreateArmor(p, e.getInventory());
 
                 } else if (clickedItem.equals(ARMOR_DIAMOND_LEGGINGS)) {
-                    as.getEquipment().setLeggings(new ItemStack(Material.DIAMOND_LEGGINGS));
+                    Objects.requireNonNull(as.getEquipment()).setLeggings(new ItemStack(Material.DIAMOND_LEGGINGS));
                     plugin.updateCreateArmor(p, e.getInventory());
 
                 } else if (clickedItem.equals(ARMOR_NETHERITE_LEGGINGS)) {
-                    as.getEquipment().setLeggings(new ItemStack(Material.NETHERITE_LEGGINGS));
+                    Objects.requireNonNull(as.getEquipment()).setLeggings(new ItemStack(Material.NETHERITE_LEGGINGS));
                     plugin.updateCreateArmor(p, e.getInventory());
 
                 } else if (clickedItem.equals(ARMOR_NO_BOOTS)) {
-                    as.getEquipment().setBoots(new ItemStack(Material.AIR));
+                    Objects.requireNonNull(as.getEquipment()).setBoots(new ItemStack(Material.AIR));
                     plugin.updateCreateArmor(p, e.getInventory());
 
                 }else if (clickedItem.equals(ARMOR_LEATHER_BOOTS)) {
-                    as.getEquipment().setBoots(new ItemStack(Material.LEATHER_BOOTS));
+                    Objects.requireNonNull(as.getEquipment()).setBoots(new ItemStack(Material.LEATHER_BOOTS));
                     plugin.updateCreateArmor(p, e.getInventory());
 
                 } else if (clickedItem.equals(ARMOR_CHAIN_BOOTS)) {
-                    as.getEquipment().setBoots(new ItemStack(Material.CHAINMAIL_BOOTS));
+                    Objects.requireNonNull(as.getEquipment()).setBoots(new ItemStack(Material.CHAINMAIL_BOOTS));
                     plugin.updateCreateArmor(p, e.getInventory());
 
                 } else if (clickedItem.equals(ARMOR_GOLD_BOOTS)) {
-                    as.getEquipment().setBoots(new ItemStack(Material.GOLDEN_BOOTS));
+                    Objects.requireNonNull(as.getEquipment()).setBoots(new ItemStack(Material.GOLDEN_BOOTS));
                     plugin.updateCreateArmor(p, e.getInventory());
 
                 } else if (clickedItem.equals(ARMOR_IRON_BOOTS)) {
-                    as.getEquipment().setBoots(new ItemStack(Material.IRON_BOOTS));
+                    Objects.requireNonNull(as.getEquipment()).setBoots(new ItemStack(Material.IRON_BOOTS));
                     plugin.updateCreateArmor(p, e.getInventory());
 
                 } else if (clickedItem.equals(ARMOR_DIAMOND_BOOTS)) {
-                    as.getEquipment().setBoots(new ItemStack(Material.DIAMOND_BOOTS));
+                    Objects.requireNonNull(as.getEquipment()).setBoots(new ItemStack(Material.DIAMOND_BOOTS));
                     plugin.updateCreateArmor(p, e.getInventory());
 
                 } else if (clickedItem.equals(ARMOR_NETHERITE_BOOTS)) {
-                    as.getEquipment().setBoots(new ItemStack(Material.NETHERITE_BOOTS));
+                    Objects.requireNonNull(as.getEquipment()).setBoots(new ItemStack(Material.NETHERITE_BOOTS));
                     plugin.updateCreateArmor(p, e.getInventory());
 
                 }

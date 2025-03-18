@@ -15,6 +15,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 import java.util.HashMap;
 import java.util.List;
+import java.util.Objects;
 
 public final class ArmorStandGenerator extends JavaPlugin {
 
@@ -22,7 +23,7 @@ public final class ArmorStandGenerator extends JavaPlugin {
     public void onEnable() {
         // Plugin startup logic
 
-        getCommand("armorstand").setExecutor(new ArmorStandCommand(this));
+        Objects.requireNonNull(getCommand("armorstand")).setExecutor(new ArmorStandCommand(this));
         getServer().getPluginManager().registerEvents(new MenuListener(this), this);
     }
 
@@ -32,6 +33,7 @@ public final class ArmorStandGenerator extends JavaPlugin {
     public ItemStack getFiller() {
         ItemStack filler = new ItemStack(Material.BLACK_STAINED_GLASS_PANE);
         ItemMeta fillerMeta = filler.getItemMeta();
+        assert fillerMeta != null;
         fillerMeta.setHideTooltip(true);
         filler.setItemMeta(fillerMeta);
 
@@ -41,6 +43,7 @@ public final class ArmorStandGenerator extends JavaPlugin {
     public ItemStack getItem(Material material, String displayName, List<String> lore) {
         ItemStack item = new ItemStack(material);
         ItemMeta itemMeta = item.getItemMeta();
+        assert itemMeta != null;
         itemMeta.setDisplayName(displayName);
         itemMeta.setLore(lore);
         item.setItemMeta(itemMeta);
@@ -52,9 +55,12 @@ public final class ArmorStandGenerator extends JavaPlugin {
         // remove enchantment effect from tab items
         for (int i = 2; i < 7; i++) {
             ItemStack tab = inventory.getItem(i);
+            assert tab != null;
             ItemMeta tabMeta = tab.getItemMeta();
+            assert tabMeta != null;
             tabMeta.setEnchantmentGlintOverride(false);
             List<String> list = tabMeta.getLore();
+            assert list != null;
             list.remove(ChatColor.GREEN + "Selected");
             if (!list.contains(ChatColor.DARK_PURPLE + "Click to select")){
                 list.add(ChatColor.DARK_PURPLE + "Click to select");
@@ -66,9 +72,12 @@ public final class ArmorStandGenerator extends JavaPlugin {
 
         // set current tab item to have enchantment effect
         ItemStack current = inventory.getItem(selectedSlot);
+        assert current != null;
         ItemMeta currentMeta = current.getItemMeta();
+        assert currentMeta != null;
         currentMeta.setEnchantmentGlintOverride(true);
         List<String> list = currentMeta.getLore();
+        assert list != null;
         list.remove(ChatColor.DARK_PURPLE + "Click to select");
         list.add(ChatColor.GREEN + "Selected");
         currentMeta.setLore(list);
@@ -163,14 +172,18 @@ public final class ArmorStandGenerator extends JavaPlugin {
 
         for (int i = 1; i<8; i++) {
             ItemStack item = inventory.getItem(i + row*9);
+            assert item != null;
             ItemMeta itemMeta = item.getItemMeta();
+            assert itemMeta != null;
             itemMeta.setLore(List.of(ChatColor.DARK_PURPLE + "Click to select"));
             itemMeta.setEnchantmentGlintOverride(false);
             item.setItemMeta(itemMeta);
             inventory.setItem(i + row*9, item);
         }
         ItemStack item = inventory.getItem(selectedSlot + row * 9);
+        assert item != null;
         ItemMeta itemMeta = item.getItemMeta();
+        assert itemMeta != null;
         itemMeta.setLore(List.of(ChatColor.GREEN + "Selected"));
         itemMeta.setEnchantmentGlintOverride(true);
         item.setItemMeta(itemMeta);
@@ -284,7 +297,9 @@ public final class ArmorStandGenerator extends JavaPlugin {
         for (int i = 1; i < 4; i++) {
             for (int j = 0; j < 4; j++){
                 ItemStack tab = inventory.getItem(i + 9*j + 18);
+                assert tab != null;
                 ItemMeta tabMeta = tab.getItemMeta();
+                assert tabMeta != null;
                 tabMeta.setEnchantmentGlintOverride(false);
                 tabMeta.setLore(List.of(ChatColor.DARK_PURPLE + "Click to select"));
                 tab.setItemMeta(tabMeta);
@@ -294,7 +309,9 @@ public final class ArmorStandGenerator extends JavaPlugin {
 
         // set enchantment effect to selected item
         ItemStack item = inventory.getItem(selectedSlot);
+        assert item != null;
         ItemMeta itemMeta = item.getItemMeta();
+        assert itemMeta != null;
         itemMeta.setEnchantmentGlintOverride(true);
         itemMeta.setLore(List.of(ChatColor.GREEN + "Selected"));
         item.setItemMeta(itemMeta);
@@ -397,10 +414,10 @@ public final class ArmorStandGenerator extends JavaPlugin {
     // update tab armor
     public void updateCreateArmor(Player p, Inventory inventory) {
         ArmorStand as = armorStands.get(p);
-        Material helmet = as.getEquipment().getHelmet().getType();
-        Material chestplate = as.getEquipment().getChestplate().getType();
-        Material leggings = as.getEquipment().getLeggings().getType();
-        Material boots = as.getEquipment().getBoots().getType();
+        Material helmet = Objects.requireNonNull(Objects.requireNonNull(as.getEquipment()).getHelmet()).getType();
+        Material chestplate = Objects.requireNonNull(as.getEquipment().getChestplate()).getType();
+        Material leggings = Objects.requireNonNull(as.getEquipment().getLeggings()).getType();
+        Material boots = Objects.requireNonNull(as.getEquipment().getBoots()).getType();
 
         switch (helmet){
             case Material.LEATHER_HELMET:
