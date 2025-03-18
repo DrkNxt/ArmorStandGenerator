@@ -1,7 +1,7 @@
-package me.drknxt.armorStands;
+package me.drknxt.armorStandGenerator;
 
-import me.drknxt.armorStands.commands.ArmorStandCommand;
-import me.drknxt.armorStands.listeners.MenuListener;
+import me.drknxt.armorStandGenerator.commands.ArmorStandCommand;
+import me.drknxt.armorStandGenerator.listeners.MenuListener;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
@@ -16,7 +16,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 import java.util.HashMap;
 import java.util.List;
 
-public final class ArmorStands extends JavaPlugin {
+public final class ArmorStandGenerator extends JavaPlugin {
 
     @Override
     public void onEnable() {

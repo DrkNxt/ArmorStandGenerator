@@ -1,9 +1,9 @@
-name: ArmorStands
+name: ArmorStandGenerator
 version: '1.0'
-main: me.drknxt.armorStands.ArmorStands
+main: me.drknxt.armorStandGenerator.ArmorStandGenerator
 api-version: '1.21'
 authors: [ DrkNxt ]
-description: Tutorial plugin with armor stands
+description: Plugin letting you generate custom armor stands using a simple to understand GUI
 commands:
   armorstand:
     description: Open armor stand creation menu

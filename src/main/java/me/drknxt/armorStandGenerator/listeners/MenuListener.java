@@ -1,6 +1,6 @@
-package me.drknxt.armorStands.listeners;
+package me.drknxt.armorStandGenerator.listeners;
 
-import me.drknxt.armorStands.ArmorStands;
+import me.drknxt.armorStandGenerator.ArmorStandGenerator;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -103,9 +103,9 @@ public class MenuListener implements Listener {
         final String COMPLETE_YES = ChatColor.GREEN + "YES";
         final String COMPLETE_NO = ChatColor.RED + "NO";
 
-    private final ArmorStands plugin;
+    private final ArmorStandGenerator plugin;
 
-    public MenuListener(ArmorStands plugin) {
+    public MenuListener(ArmorStandGenerator plugin) {
         this.plugin = plugin;
     }
 

@@ -1,6 +1,6 @@
-package me.drknxt.armorStands.commands;
+package me.drknxt.armorStandGenerator.commands;
 
-import me.drknxt.armorStands.ArmorStands;
+import me.drknxt.armorStandGenerator.ArmorStandGenerator;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -9,9 +9,9 @@ import org.bukkit.entity.Player;
 
 public class ArmorStandCommand implements CommandExecutor {
 
-    private final ArmorStands plugin;
+    private final ArmorStandGenerator plugin;
 
-    public ArmorStandCommand(ArmorStands plugin) {
+    public ArmorStandCommand(ArmorStandGenerator plugin) {
         this.plugin = plugin;
 
     }
