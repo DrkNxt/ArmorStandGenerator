@@ -5,8 +5,11 @@ api-version: '1.21'
 authors: [ DrkNxt ]
 description: Plugin letting you generate custom armor stands using a simple to understand GUI
 commands:
-  armorstand:
-    description: Open armor stand creation menu
-    usage: /<command>
+  asg:
+    description: Open armor stand generator menu
+    usage: /<command> [mainhand|offhand|head|chest|legs|feet]
     aliases:
       - as
+      - armorstand
+      - armorstandgen
+      - armorstandgenerator
