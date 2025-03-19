@@ -23,7 +23,7 @@ public final class ArmorStandGenerator extends JavaPlugin {
     public void onEnable() {
         // Plugin startup logic
 
-        Objects.requireNonNull(getCommand("armorstand")).setExecutor(new ArmorStandCommand(this));
+        Objects.requireNonNull(getCommand("asg")).setExecutor(new ArmorStandCommand(this));
         getServer().getPluginManager().registerEvents(new MenuListener(this), this);
     }
 
@@ -168,7 +168,7 @@ public final class ArmorStandGenerator extends JavaPlugin {
         }
     }
 
-    public void setEnchantmentOverride(Inventory inventory, int row, int selectedSlot){
+    public void setArmorEnchantmentOverride(Inventory inventory, int row, int selectedSlot){
 
         for (int i = 1; i<8; i++) {
             ItemStack item = inventory.getItem(i + row*9);
@@ -190,8 +190,17 @@ public final class ArmorStandGenerator extends JavaPlugin {
         inventory.setItem(selectedSlot + row*9, item);
     }
 
-    
-    // TODO: allow name change?
+    public void setHandEnchantmentOverride(Inventory inventory, int selectedSlot) {
+        ItemStack item = inventory.getItem(selectedSlot);
+        assert item != null;
+        ItemMeta itemMeta = item.getItemMeta();
+        assert itemMeta != null;
+        itemMeta.setLore(List.of(ChatColor.GREEN + "Selected"));
+        itemMeta.setEnchantmentGlintOverride(true);
+        item.setItemMeta(itemMeta);
+        inventory.setItem(selectedSlot, item);
+    }
+
     // create menu tabs
     // open tab settings
     public void openCreateSettings(Player p, Inventory inventory) {
@@ -209,9 +218,13 @@ public final class ArmorStandGenerator extends JavaPlugin {
         ItemStack arms = getItem(Material.STICK, ChatColor.YELLOW + "Arms", List.of(ChatColor.DARK_PURPLE + "Click to toggle"));
         ItemStack marker = getItem(Material.DRAGON_BREATH, ChatColor.YELLOW + "Marker", List.of(ChatColor.DARK_PURPLE + "Click to toggle"));
         ItemStack glowing = getItem(Material.GLOW_INK_SAC, ChatColor.YELLOW + "Glowing", List.of(ChatColor.DARK_PURPLE + "Click to toggle"));
-        ItemStack collidable = getItem(Material.PISTON, ChatColor.YELLOW + "Collidable", List.of(ChatColor.DARK_PURPLE + "Click to toggle"));
+        ItemStack customName = getItem(Material.NAME_TAG, ChatColor.YELLOW + "Custom Name Visible", List.of(ChatColor.DARK_PURPLE + "Click to toggle"));
         ItemStack invisible = getItem(Material.GLASS, ChatColor.YELLOW + "Invisible", List.of(ChatColor.DARK_PURPLE + "Click to toggle"));
         ItemStack small = getItem(Material.ARMOR_STAND, ChatColor.YELLOW + "Small", List.of(ChatColor.DARK_PURPLE + "Click to toggle"));
+
+        ItemStack setCustomName = getItem(Material.KNOWLEDGE_BOOK, ChatColor.YELLOW + "Set Custom Name",
+                List.of(ChatColor.GOLD + "Use " + ChatColor.DARK_PURPLE + "/asg setname <name>" + ChatColor.GOLD + " to set the" , ChatColor.GOLD + "custom name for this armor stand"));
+
 
         // set option items
         inventory.setItem(20, gravity);
@@ -221,9 +234,11 @@ public final class ArmorStandGenerator extends JavaPlugin {
         inventory.setItem(24, arms);
         inventory.setItem(38, marker);
         inventory.setItem(39, glowing);
-        inventory.setItem(40, collidable);
+        inventory.setItem(40, customName);
         inventory.setItem(41, invisible);
         inventory.setItem(42, small);
+
+        inventory.setItem(35, setCustomName);
 
         // set on/off items
         ArmorStand as = armorStands.get(p);
@@ -270,7 +285,7 @@ public final class ArmorStandGenerator extends JavaPlugin {
             inventory.setItem(48, off);
         }
 
-        if (as.isCollidable()) {
+        if (as.isCustomNameVisible()) {
             inventory.setItem(49, on);
         }else {
             inventory.setItem(49, off);
@@ -397,18 +412,232 @@ public final class ArmorStandGenerator extends JavaPlugin {
         getCreatePositon(p, inventory, 19);
     }
 
-    // TODO
     // open tab main hand
-    public void openCreateMainHand(Inventory inventory) {
+    public void updateCreateHand(Player p, Inventory inventory) {
+        for (int i = 1; i<8; i++) {
+            for (int j = 2; j<5; j++){
+                ItemStack item = inventory.getItem(i + j*9);
+                assert item != null;
+                ItemMeta itemMeta = item.getItemMeta();
+                assert itemMeta != null;
+                itemMeta.setLore(List.of(ChatColor.DARK_PURPLE + "Click to select"));
+                itemMeta.setEnchantmentGlintOverride(false);
+                item.setItemMeta(itemMeta);
+                inventory.setItem(i + j*9, item);
+            }
+        }
+        ItemStack item = inventory.getItem(49);
+        assert item != null;
+        ItemMeta itemMeta = item.getItemMeta();
+        assert itemMeta != null;
+        itemMeta.setLore(List.of(ChatColor.DARK_PURPLE + "Click to select"));
+        itemMeta.setEnchantmentGlintOverride(false);
+        item.setItemMeta(itemMeta);
+        inventory.setItem(49, item);
 
-        setSelectedTab(inventory, 4);
+        Material current;
+        boolean isMainHand = Objects.requireNonNull(Objects.requireNonNull(inventory.getItem(4)).getItemMeta()).getEnchantmentGlintOverride();
+
+        if (isMainHand) {
+            current = Objects.requireNonNull(armorStands.get(p).getEquipment()).getItemInMainHand().getType();
+        }else {
+            current = Objects.requireNonNull(armorStands.get(p).getEquipment()).getItemInOffHand().getType();
+        }
+
+        if (Objects.requireNonNull(inventory.getItem(46)).getType() != Material.ARROW) {
+            switch (current) {
+                case AIR: setHandEnchantmentOverride(inventory, 49); break;
+                case WOODEN_SWORD: setHandEnchantmentOverride(inventory, 19); break;
+                case STONE_SWORD: setHandEnchantmentOverride(inventory, 20); break;
+                case IRON_SWORD: setHandEnchantmentOverride(inventory, 21); break;
+                case GOLDEN_SWORD: setHandEnchantmentOverride(inventory, 22); break;
+                case DIAMOND_SWORD: setHandEnchantmentOverride(inventory, 23); break;
+                case NETHERITE_SWORD: setHandEnchantmentOverride(inventory, 24); break;
+                case WOODEN_AXE: setHandEnchantmentOverride(inventory, 28); break;
+                case STONE_AXE: setHandEnchantmentOverride(inventory, 29); break;
+                case IRON_AXE: setHandEnchantmentOverride(inventory, 30); break;
+                case GOLDEN_AXE: setHandEnchantmentOverride(inventory, 31); break;
+                case DIAMOND_AXE: setHandEnchantmentOverride(inventory, 32); break;
+                case NETHERITE_AXE: setHandEnchantmentOverride(inventory, 33); break;
+                case WOODEN_PICKAXE: setHandEnchantmentOverride(inventory, 37); break;
+                case STONE_PICKAXE: setHandEnchantmentOverride(inventory, 38); break;
+                case IRON_PICKAXE: setHandEnchantmentOverride(inventory, 39); break;
+                case GOLDEN_PICKAXE: setHandEnchantmentOverride(inventory, 40); break;
+                case DIAMOND_PICKAXE: setHandEnchantmentOverride(inventory, 41); break;
+                case NETHERITE_PICKAXE: setHandEnchantmentOverride(inventory, 42); break;
+                case SHIELD: setHandEnchantmentOverride(inventory, 25); break;
+                case BOW: setHandEnchantmentOverride(inventory, 34); break;
+                case CROSSBOW: setHandEnchantmentOverride(inventory, 43); break;
+            }
+        }else {
+            switch (current) {
+                case AIR: setHandEnchantmentOverride(inventory, 49); break;
+                case WOODEN_SHOVEL: setHandEnchantmentOverride(inventory, 19); break;
+                case STONE_SHOVEL: setHandEnchantmentOverride(inventory, 20); break;
+                case IRON_SHOVEL: setHandEnchantmentOverride(inventory, 21); break;
+                case GOLDEN_SHOVEL: setHandEnchantmentOverride(inventory, 22); break;
+                case DIAMOND_SHOVEL: setHandEnchantmentOverride(inventory, 23); break;
+                case NETHERITE_SHOVEL: setHandEnchantmentOverride(inventory, 24); break;
+                case WOODEN_HOE: setHandEnchantmentOverride(inventory, 28); break;
+                case STONE_HOE: setHandEnchantmentOverride(inventory, 29); break;
+                case IRON_HOE: setHandEnchantmentOverride(inventory, 30); break;
+                case GOLDEN_HOE: setHandEnchantmentOverride(inventory, 31); break;
+                case DIAMOND_HOE: setHandEnchantmentOverride(inventory, 32); break;
+                case NETHERITE_HOE: setHandEnchantmentOverride(inventory, 33); break;
+                case FISHING_ROD: setHandEnchantmentOverride(inventory, 37); break;
+                case FLINT_AND_STEEL: setHandEnchantmentOverride(inventory, 38); break;
+                case SHEARS: setHandEnchantmentOverride(inventory, 39); break;
+                case SPYGLASS: setHandEnchantmentOverride(inventory, 40); break;
+                case BRUSH: setHandEnchantmentOverride(inventory, 41); break;
+                case COMPASS: setHandEnchantmentOverride(inventory, 42); break;
+                case TRIDENT: setHandEnchantmentOverride(inventory, 25); break;
+                case MACE: setHandEnchantmentOverride(inventory, 34); break;
+                case CLOCK: setHandEnchantmentOverride(inventory, 43); break;
+            }
+        }
+
     }
 
-    // TODO
+    public void openCreateHandPage(Inventory inventory, int page) {
+
+
+        if (page == 1) {
+            // set page 1 items
+            ItemStack woodenSword = getItem(Material.WOODEN_SWORD, ChatColor.YELLOW + "Wooden Sword", List.of(ChatColor.DARK_PURPLE + "Click to select"));
+            ItemStack stoneSword = getItem(Material.STONE_SWORD, ChatColor.YELLOW + "Stone Sword", List.of(ChatColor.DARK_PURPLE + "Click to select"));
+            ItemStack ironSword = getItem(Material.IRON_SWORD, ChatColor.YELLOW + "Iron Sword", List.of(ChatColor.DARK_PURPLE + "Click to select"));
+            ItemStack goldSword = getItem(Material.GOLDEN_SWORD, ChatColor.YELLOW + "Golden Sword", List.of(ChatColor.DARK_PURPLE + "Click to select"));
+            ItemStack diamondSword = getItem(Material.DIAMOND_SWORD, ChatColor.YELLOW + "Diamond Sword", List.of(ChatColor.DARK_PURPLE + "Click to select"));
+            ItemStack netheriteSword = getItem(Material.NETHERITE_SWORD, ChatColor.YELLOW + "Netherite Sword", List.of(ChatColor.DARK_PURPLE + "Click to select"));
+
+            ItemStack woodenAxe = getItem(Material.WOODEN_AXE, ChatColor.YELLOW + "Wooden Axe", List.of(ChatColor.DARK_PURPLE + "Click to select"));
+            ItemStack stoneAxe = getItem(Material.STONE_AXE, ChatColor.YELLOW + "Stone Axe", List.of(ChatColor.DARK_PURPLE + "Click to select"));
+            ItemStack ironAxe = getItem(Material.IRON_AXE, ChatColor.YELLOW + "Iron Axe", List.of(ChatColor.DARK_PURPLE + "Click to select"));
+            ItemStack goldAxe = getItem(Material.GOLDEN_AXE, ChatColor.YELLOW + "Golden Axe", List.of(ChatColor.DARK_PURPLE + "Click to select"));
+            ItemStack diamondAxe = getItem(Material.DIAMOND_AXE, ChatColor.YELLOW + "Diamond Axe", List.of(ChatColor.DARK_PURPLE + "Click to select"));
+            ItemStack netheriteAxe = getItem(Material.NETHERITE_AXE, ChatColor.YELLOW + "Netherite Axe", List.of(ChatColor.DARK_PURPLE + "Click to select"));
+
+            ItemStack woodenPickaxe = getItem(Material.WOODEN_PICKAXE, ChatColor.YELLOW + "Wooden Pickaxe", List.of(ChatColor.DARK_PURPLE + "Click to select"));
+            ItemStack stonePickaxe = getItem(Material.STONE_PICKAXE, ChatColor.YELLOW + "Stone Pickaxe", List.of(ChatColor.DARK_PURPLE + "Click to select"));
+            ItemStack ironPickaxe = getItem(Material.IRON_PICKAXE, ChatColor.YELLOW + "Iron Pickaxe", List.of(ChatColor.DARK_PURPLE + "Click to select"));
+            ItemStack goldPickaxe = getItem(Material.GOLDEN_PICKAXE, ChatColor.YELLOW + "Golden Pickaxe", List.of(ChatColor.DARK_PURPLE + "Click to select"));
+            ItemStack diamondPickaxe = getItem(Material.DIAMOND_PICKAXE, ChatColor.YELLOW + "Diamond Pickaxe", List.of(ChatColor.DARK_PURPLE + "Click to select"));
+            ItemStack netheritePickaxe = getItem(Material.NETHERITE_PICKAXE, ChatColor.YELLOW + "Netherite Pickaxe", List.of(ChatColor.DARK_PURPLE + "Click to select"));
+
+            ItemStack shield = getItem(Material.SHIELD, ChatColor.YELLOW + "Shield", List.of(ChatColor.DARK_PURPLE + "Click to select"));
+            ItemStack bow = getItem(Material.BOW, ChatColor.YELLOW + "Bow", List.of(ChatColor.DARK_PURPLE + "Click to select"));
+            ItemStack crossbow = getItem(Material.CROSSBOW, ChatColor.YELLOW + "Crossbow", List.of(ChatColor.DARK_PURPLE + "Click to select"));
+            ItemStack nextPage = getItem(Material.ARROW, ChatColor.YELLOW + "Next Page", List.of(ChatColor.DARK_PURPLE + "Click to go to next page"));
+
+            inventory.setItem(19, woodenSword);
+            inventory.setItem(20, stoneSword);
+            inventory.setItem(21, ironSword);
+            inventory.setItem(22, goldSword);
+            inventory.setItem(23, diamondSword);
+            inventory.setItem(24, netheriteSword);
+
+            inventory.setItem(28, woodenAxe);
+            inventory.setItem(29, stoneAxe);
+            inventory.setItem(30, ironAxe);
+            inventory.setItem(31, goldAxe);
+            inventory.setItem(32, diamondAxe);
+            inventory.setItem(33, netheriteAxe);
+
+            inventory.setItem(37, woodenPickaxe);
+            inventory.setItem(38, stonePickaxe);
+            inventory.setItem(39, ironPickaxe);
+            inventory.setItem(40, goldPickaxe);
+            inventory.setItem(41, diamondPickaxe);
+            inventory.setItem(42, netheritePickaxe);
+
+            inventory.setItem(25, shield);
+            inventory.setItem(34, bow);
+            inventory.setItem(43, crossbow);
+            inventory.setItem(52, nextPage);
+            inventory.setItem(46, getFiller());
+
+        } else {
+            // set page 2 items
+            ItemStack woodenShovel = getItem(Material.WOODEN_SHOVEL, ChatColor.YELLOW + "Wooden Shovel", List.of(ChatColor.DARK_PURPLE + "Click to select"));
+            ItemStack stoneShovel = getItem(Material.STONE_SHOVEL, ChatColor.YELLOW + "Stone Shovel", List.of(ChatColor.DARK_PURPLE + "Click to select"));
+            ItemStack ironShovel = getItem(Material.IRON_SHOVEL, ChatColor.YELLOW + "Iron Shovel", List.of(ChatColor.DARK_PURPLE + "Click to select"));
+            ItemStack goldShovel = getItem(Material.GOLDEN_SHOVEL, ChatColor.YELLOW + "Golden Shovel", List.of(ChatColor.DARK_PURPLE + "Click to select"));
+            ItemStack diamondShovel = getItem(Material.DIAMOND_SHOVEL, ChatColor.YELLOW + "Diamond Shovel", List.of(ChatColor.DARK_PURPLE + "Click to select"));
+            ItemStack netheriteShovel = getItem(Material.NETHERITE_SHOVEL, ChatColor.YELLOW + "Netherite Shovel", List.of(ChatColor.DARK_PURPLE + "Click to select"));
+
+            ItemStack woodenHoe = getItem(Material.WOODEN_HOE, ChatColor.YELLOW + "Wooden Hoe", List.of(ChatColor.DARK_PURPLE + "Click to select"));
+            ItemStack stoneHoe = getItem(Material.STONE_HOE, ChatColor.YELLOW + "Stone Hoe", List.of(ChatColor.DARK_PURPLE + "Click to select"));
+            ItemStack ironHoe = getItem(Material.IRON_HOE, ChatColor.YELLOW + "Iron Hoe", List.of(ChatColor.DARK_PURPLE + "Click to select"));
+            ItemStack goldHoe = getItem(Material.GOLDEN_HOE, ChatColor.YELLOW + "Golden Hoe", List.of(ChatColor.DARK_PURPLE + "Click to select"));
+            ItemStack diamondHoe = getItem(Material.DIAMOND_HOE, ChatColor.YELLOW + "Diamond Hoe", List.of(ChatColor.DARK_PURPLE + "Click to select"));
+            ItemStack netheriteHoe = getItem(Material.NETHERITE_HOE, ChatColor.YELLOW + "Netherite Hoe", List.of(ChatColor.DARK_PURPLE + "Click to select"));
+
+            ItemStack fishingRod = getItem(Material.FISHING_ROD, ChatColor.YELLOW + "Fishing Rod", List.of(ChatColor.DARK_PURPLE + "Click to select"));
+            ItemStack flintAndSteel = getItem(Material.FLINT_AND_STEEL, ChatColor.YELLOW + "Flint And Steel", List.of(ChatColor.DARK_PURPLE + "Click to select"));
+            ItemStack shears = getItem(Material.SHEARS, ChatColor.YELLOW + "Shears", List.of(ChatColor.DARK_PURPLE + "Click to select"));
+            ItemStack spyglass = getItem(Material.SPYGLASS, ChatColor.YELLOW + "Spyglass", List.of(ChatColor.DARK_PURPLE + "Click to select"));
+            ItemStack brush = getItem(Material.BRUSH, ChatColor.YELLOW + "Brush", List.of(ChatColor.DARK_PURPLE + "Click to select"));
+            ItemStack compass = getItem(Material.COMPASS, ChatColor.YELLOW + "Compass", List.of(ChatColor.DARK_PURPLE + "Click to select"));
+
+            ItemStack trident = getItem(Material.TRIDENT, ChatColor.YELLOW + "Trident", List.of(ChatColor.DARK_PURPLE + "Click to select"));
+            ItemStack mace = getItem(Material.MACE, ChatColor.YELLOW + "Mace", List.of(ChatColor.DARK_PURPLE + "Click to select"));
+            ItemStack clock = getItem(Material.CLOCK, ChatColor.YELLOW + "Clock", List.of(ChatColor.DARK_PURPLE + "Click to select"));
+            ItemStack prevPage = getItem(Material.ARROW, ChatColor.YELLOW + "Previous Page", List.of(ChatColor.DARK_PURPLE + "Click to go to previous page"));
+
+            inventory.setItem(19, woodenShovel);
+            inventory.setItem(20, stoneShovel);
+            inventory.setItem(21, ironShovel);
+            inventory.setItem(22, goldShovel);
+            inventory.setItem(23, diamondShovel);
+            inventory.setItem(24, netheriteShovel);
+
+            inventory.setItem(28, woodenHoe);
+            inventory.setItem(29, stoneHoe);
+            inventory.setItem(30, ironHoe);
+            inventory.setItem(31, goldHoe);
+            inventory.setItem(32, diamondHoe);
+            inventory.setItem(33, netheriteHoe);
+
+            inventory.setItem(37, fishingRod);
+            inventory.setItem(38, flintAndSteel);
+            inventory.setItem(39, shears);
+            inventory.setItem(40, spyglass);
+            inventory.setItem(41, brush);
+            inventory.setItem(42, compass);
+
+            inventory.setItem(25, trident);
+            inventory.setItem(34, mace);
+            inventory.setItem(43, clock);
+            inventory.setItem(46, prevPage);
+            inventory.setItem(52, getFiller());
+        }
+
+        ItemStack otherItem = getItem(Material.KNOWLEDGE_BOOK, ChatColor.YELLOW + "Use Other Item",
+                List.of(ChatColor.GOLD + "Use " + ChatColor.DARK_PURPLE + "/asg mainhand | offhand" + ChatColor.GOLD + " to set the" , ChatColor.GOLD + "held item to your currently held item"));
+        ItemStack noItem = getItem(Material.STRUCTURE_VOID, ChatColor.YELLOW + "No Item", List.of(ChatColor.DARK_PURPLE + "Click to select"));
+
+
+        inventory.setItem(49, noItem);
+        inventory.setItem(35, otherItem);
+    }
+
+    public void openCreateMainHand(Player p, Inventory inventory) {
+
+        setSelectedTab(inventory, 4);
+
+        openCreateHandPage(inventory, 1);
+
+        updateCreateHand(p, inventory);
+    }
+
     // open tab off hand
-    public void openCreateOffHand(Inventory inventory) {
+    public void openCreateOffHand(Player p, Inventory inventory) {
 
         setSelectedTab(inventory, 5);
+
+        openCreateHandPage(inventory, 1);
+
+        updateCreateHand(p, inventory);
     }
 
     // update tab armor
@@ -421,97 +650,97 @@ public final class ArmorStandGenerator extends JavaPlugin {
 
         switch (helmet){
             case Material.LEATHER_HELMET:
-                setEnchantmentOverride(inventory, 2, 2);
+                setArmorEnchantmentOverride(inventory, 2, 2);
                 break;
             case Material.CHAINMAIL_HELMET:
-                setEnchantmentOverride(inventory, 2, 3);
+                setArmorEnchantmentOverride(inventory, 2, 3);
                 break;
             case Material.GOLDEN_HELMET:
-                setEnchantmentOverride(inventory, 2, 4);
+                setArmorEnchantmentOverride(inventory, 2, 4);
                 break;
             case Material.IRON_HELMET:
-                setEnchantmentOverride(inventory, 2, 5);
+                setArmorEnchantmentOverride(inventory, 2, 5);
                 break;
             case Material.DIAMOND_HELMET:
-                setEnchantmentOverride(inventory, 2, 6);
+                setArmorEnchantmentOverride(inventory, 2, 6);
                 break;
             case Material.NETHERITE_HELMET:
-                setEnchantmentOverride(inventory, 2, 7);
+                setArmorEnchantmentOverride(inventory, 2, 7);
                 break;
             default:
-                setEnchantmentOverride(inventory, 2, 1);
+                setArmorEnchantmentOverride(inventory, 2, 1);
                 break;
         }
 
         switch (chestplate){
             case Material.LEATHER_CHESTPLATE:
-                setEnchantmentOverride(inventory, 3, 2);
+                setArmorEnchantmentOverride(inventory, 3, 2);
                 break;
             case Material.CHAINMAIL_CHESTPLATE:
-                setEnchantmentOverride(inventory, 3, 3);
+                setArmorEnchantmentOverride(inventory, 3, 3);
                 break;
             case Material.GOLDEN_CHESTPLATE:
-                setEnchantmentOverride(inventory, 3, 4);
+                setArmorEnchantmentOverride(inventory, 3, 4);
                 break;
             case Material.IRON_CHESTPLATE:
-                setEnchantmentOverride(inventory, 3, 5);
+                setArmorEnchantmentOverride(inventory, 3, 5);
                 break;
             case Material.DIAMOND_CHESTPLATE:
-                setEnchantmentOverride(inventory, 3, 6);
+                setArmorEnchantmentOverride(inventory, 3, 6);
                 break;
             case Material.NETHERITE_CHESTPLATE:
-                setEnchantmentOverride(inventory, 3, 7);
+                setArmorEnchantmentOverride(inventory, 3, 7);
                 break;
             default:
-                setEnchantmentOverride(inventory, 3, 1);
+                setArmorEnchantmentOverride(inventory, 3, 1);
                 break;
         }
 
         switch (leggings){
             case Material.LEATHER_LEGGINGS:
-                setEnchantmentOverride(inventory, 4, 2);
+                setArmorEnchantmentOverride(inventory, 4, 2);
                 break;
             case Material.CHAINMAIL_LEGGINGS:
-                setEnchantmentOverride(inventory, 4, 3);
+                setArmorEnchantmentOverride(inventory, 4, 3);
                 break;
             case Material.GOLDEN_LEGGINGS:
-                setEnchantmentOverride(inventory, 4, 4);
+                setArmorEnchantmentOverride(inventory, 4, 4);
                 break;
             case Material.IRON_LEGGINGS:
-                setEnchantmentOverride(inventory, 4, 5);
+                setArmorEnchantmentOverride(inventory, 4, 5);
                 break;
             case Material.DIAMOND_LEGGINGS:
-                setEnchantmentOverride(inventory, 4, 6);
+                setArmorEnchantmentOverride(inventory, 4, 6);
                 break;
             case Material.NETHERITE_LEGGINGS:
-                setEnchantmentOverride(inventory, 4, 7);
+                setArmorEnchantmentOverride(inventory, 4, 7);
                 break;
             default:
-                setEnchantmentOverride(inventory, 4, 1);
+                setArmorEnchantmentOverride(inventory, 4, 1);
                 break;
         }
 
         switch (boots){
             case Material.LEATHER_BOOTS:
-                setEnchantmentOverride(inventory, 5, 2);
+                setArmorEnchantmentOverride(inventory, 5, 2);
                 break;
             case Material.CHAINMAIL_BOOTS:
-                setEnchantmentOverride(inventory, 5, 3);
+                setArmorEnchantmentOverride(inventory, 5, 3);
                 break;
             case Material.GOLDEN_BOOTS:
-                setEnchantmentOverride(inventory, 5, 4);
+                setArmorEnchantmentOverride(inventory, 5, 4);
                 break;
             case Material.IRON_BOOTS:
-                setEnchantmentOverride(inventory, 5, 5);
+                setArmorEnchantmentOverride(inventory, 5, 5);
                 break;
             case Material.DIAMOND_BOOTS:
-                setEnchantmentOverride(inventory, 5, 6);
+                setArmorEnchantmentOverride(inventory, 5, 6);
                 break;
             case Material.NETHERITE_BOOTS:
-                setEnchantmentOverride(inventory, 5, 7);
+                setArmorEnchantmentOverride(inventory, 5, 7);
                 break;
             default:
-                setEnchantmentOverride(inventory, 5, 1);
+                setArmorEnchantmentOverride(inventory, 5, 1);
                 break;
         }
 
@@ -523,10 +752,10 @@ public final class ArmorStandGenerator extends JavaPlugin {
         setSelectedTab(inventory, 6);
 
         // create armor items
-        ItemStack noHelmet = getItem(Material.BARRIER, ChatColor.YELLOW + "No Helmet", List.of(ChatColor.DARK_PURPLE + "Click to select"));
-        ItemStack noChestplate = getItem(Material.BARRIER, ChatColor.YELLOW + "No Chestplate", List.of(ChatColor.DARK_PURPLE + "Click to select"));
-        ItemStack noLeggings = getItem(Material.BARRIER, ChatColor.YELLOW + "No Leggings", List.of(ChatColor.DARK_PURPLE + "Click to select"));
-        ItemStack noBoots = getItem(Material.BARRIER, ChatColor.YELLOW + "No Boots", List.of(ChatColor.DARK_PURPLE + "Click to select"));
+        ItemStack noHelmet = getItem(Material.STRUCTURE_VOID, ChatColor.YELLOW + "No Helmet", List.of(ChatColor.DARK_PURPLE + "Click to select"));
+        ItemStack noChestplate = getItem(Material.STRUCTURE_VOID, ChatColor.YELLOW + "No Chestplate", List.of(ChatColor.DARK_PURPLE + "Click to select"));
+        ItemStack noLeggings = getItem(Material.STRUCTURE_VOID, ChatColor.YELLOW + "No Leggings", List.of(ChatColor.DARK_PURPLE + "Click to select"));
+        ItemStack noBoots = getItem(Material.STRUCTURE_VOID, ChatColor.YELLOW + "No Boots", List.of(ChatColor.DARK_PURPLE + "Click to select"));
 
         ItemStack leatherHelmet = getItem(Material.LEATHER_HELMET, ChatColor.YELLOW + "Leather Helmet", List.of(ChatColor.DARK_PURPLE + "Click to select"));
         ItemStack leatherChestplate = getItem(Material.LEATHER_CHESTPLATE, ChatColor.YELLOW + "Leather Chestplate", List.of(ChatColor.DARK_PURPLE + "Click to select"));
@@ -557,6 +786,9 @@ public final class ArmorStandGenerator extends JavaPlugin {
         ItemStack netheriteChestplate = getItem(Material.NETHERITE_CHESTPLATE, ChatColor.YELLOW + "Netherite Chestplate", List.of(ChatColor.DARK_PURPLE + "Click to select"));
         ItemStack netheriteLeggings = getItem(Material.NETHERITE_LEGGINGS, ChatColor.YELLOW + "Netherite Leggings", List.of(ChatColor.DARK_PURPLE + "Click to select"));
         ItemStack netheriteBoots = getItem(Material.NETHERITE_BOOTS, ChatColor.YELLOW + "Netherite Boots", List.of(ChatColor.DARK_PURPLE + "Click to select"));
+
+        ItemStack otherItem = getItem(Material.KNOWLEDGE_BOOK, ChatColor.YELLOW + "Use Other Item",
+                List.of(ChatColor.GOLD + "Use " + ChatColor.DARK_PURPLE + "/asg head | chest | legs | feet" + ChatColor.GOLD + " to set the" , ChatColor.GOLD + "worn item to your currently held item"));
 
         inventory.setItem(19, noHelmet);
         inventory.setItem(20, leatherHelmet);
@@ -589,6 +821,8 @@ public final class ArmorStandGenerator extends JavaPlugin {
         inventory.setItem(50, ironBoots);
         inventory.setItem(51, diamondBoots);
         inventory.setItem(52, netheriteBoots);
+
+        inventory.setItem(35, otherItem);
 
         updateCreateArmor(p, inventory);
 
